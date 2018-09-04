@@ -3,6 +3,7 @@ defmodule LunnarApiWeb.UserController do
 
   alias LunnarApi.Accounts
   alias LunnarApi.Accounts.User
+  alias LunnarApi.Guardian
 
   action_fallback LunnarApiWeb.FallbackController
 
@@ -11,12 +12,19 @@ defmodule LunnarApiWeb.UserController do
     render(conn, "index.json", users: users)
   end
 
+  def sign_in(conn, %{"email" => email, "password" => password}) do
+    case Accounts.token_sign_in(email, password) do
+      {:ok, token, _claims} ->
+        conn |> render("jwt.json", jwt: token)
+      _ ->
+        {:error, :unauthorized}
+    end
+  end
+
   def create(conn, %{"user" => user_params}) do
-    with {:ok, %User{} = user} <- Accounts.create_user(user_params) do
-      conn
-      |> put_status(:created)
-      |> put_resp_header("location", user_path(conn, :show, user))
-      |> render("show.json", user: user)
+    with {:ok, %User{} = user} <- Accounts.create_user(user_params),
+         {:ok, token, _claims} <- Guardian.encode_and_sign(user) do
+                conn |> render("jwt.json", jwt: token)
     end
   end
 

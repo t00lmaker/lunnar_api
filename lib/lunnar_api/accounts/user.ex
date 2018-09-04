@@ -1,6 +1,10 @@
 defmodule LunnarApi.Accounts.User do
-  use Ecto.Schema
+  @moduledoc """
+      Especifica o Schema para User. 
+  """
   import Ecto.Changeset
+  use Ecto.Schema
+  alias Comeonin.Bcrypt
 
   schema "users" do
     field :email, :string
@@ -27,7 +31,7 @@ defmodule LunnarApi.Accounts.User do
     case changeset do
       %Ecto.Changeset{valid?: true, changes: %{password: pass}}
         ->
-          put_change(changeset, :password_hash, Comeonin.Bcrypt.hashpwsalt(pass))
+          put_change(changeset, :password_hash, Bcrypt.hashpwsalt(pass))
       _ ->
           changeset
     end

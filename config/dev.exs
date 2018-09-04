@@ -42,5 +42,5 @@ config :lunnar_api, LunnarApi.Repo,
   username: "postgres",
   password: "postgres",
   database: "lunnar_api_dev",
-  hostname: "172.17.0.5",
+  hostname: "172.17.0.3",
   pool_size: 10
